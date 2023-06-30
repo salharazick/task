@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\registerRequest;
 use App\Models\customer;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
@@ -11,21 +12,16 @@ use Illuminate\Support\Facades\Auth;
 
 class authController extends Controller
 {
-    function register(Request $request)
+    function register(registerRequest $request)
     {
-        $validator= validator::make( $request->all(),
-        [
-            'name' => 'required|string|max:255',
-            'email' => 'required|string|email|unique:customers',
-            'password' => 'required|min:5',
+          
+        $validator = Validator::make($request->all(), $request->rules());
 
-        ],
-
-        );
         
-        if($validator->fails())
-        {
-            return response()->json($validator->errors());
+        if ($validator->fails()) {
+            return response()->json([
+                'errors' => $validator->errors()
+            ], 422);
         }
 
         else{
@@ -46,15 +42,19 @@ class authController extends Controller
 
     function login(Request $request)
     {
-        $credentials = $request->only('email', 'password');
+        $user = customer::where(['email'=>$request->email])->first();
 
-        if (Auth::attempt($credentials)) {
-            $user = Auth::customer();
-    
-            return response()->json(['login success'], 200);
-        } else {
+        if(!$user || !Hash::check($request->password,$user->password))
+        {
             return response()->json(['error' => 'Unauthenticated'], 401);
         }
+        else
+        {
+            return response()->json(['message' => 'Login successful'], 200);
+        }
+            
+     
+
     }
 
 }

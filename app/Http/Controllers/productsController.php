@@ -2,13 +2,13 @@
 
 namespace App\Http\Controllers;
 
-use App\Http\Requests\categoryStoreRequest;
+use App\Http\Requests\productStoreRequest;
 use App\Http\Requests\productUpdateRequest;
-use App\Http\Resources\categoryResource;
-use App\Models\category;
+use App\Http\Resources\productResource;
+use App\Models\product;
 use Illuminate\Support\Facades\Validator;
 
-class categoryController extends Controller
+class productsController extends Controller
 {
     /**
      * Display a listing of the resource.
@@ -17,8 +17,8 @@ class categoryController extends Controller
      */
     public function index()
     {
-        $category = category::paginate(2);
-        return response()->json(categoryResource::collection($category));
+        $products = Product::paginate(2);
+        return response()->json(productResource::collection($products));
     }
 
     /**
@@ -27,55 +27,57 @@ class categoryController extends Controller
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
-    public function store(categoryStoreRequest $request)
+
+    public function store(productStoreRequest $request)
     {
-        $validator = Validator::make($request->all(), $request->rules());
+    $validator = Validator::make($request->all(), $request->rules());
 
         if ($validator->fails()) {
             return response()->json([
                 'errors' => $validator->errors()
             ], 422);
         }
+    $product = product::create($request->validated());
 
-        $category = category::create($request->validated());
-
-        return response()->json(new categoryResource($category), 201);
-    }
+    return response()->json(new productResource($product), 201);
+   }
+    
 
     /**
      * Display the specified resource.
      *
-     * @param  \App\Models\category  $category
+     * @param  \App\Models\product  $product
      * @return \Illuminate\Http\Response
      */
-    public function show(category $category)
+    public function show(product $product)
     {
-        return response()->json(new categoryResource($category));
+        return response()->json(new productResource($product));
     }
 
     /**
      * Update the specified resource in storage.
      *
      * @param  \Illuminate\Http\Request  $request
-     * @param  \App\Models\category  $category
+     * @param  \App\Models\product  $product
      * @return \Illuminate\Http\Response
      */
-    public function update(productUpdateRequest $request, category $category)
+    public function update(productUpdateRequest $request, product $product)
     {
-        $category->update($request->validated());
+        
+        $product->update($request->validated());
 
-        return response()->json(new categoryResource($category));
+        return response()->json(new productResource($product));
     }
 
     /**
      * Remove the specified resource from storage.
      *
-     * @param  \App\Models\category  $category
+     * @param  \App\Models\product  $product
      * @return \Illuminate\Http\Response
      */
-    public function destroy(category $category)
+    public function destroy(product $product)
     {
-        $category->delete();
+        $product->delete();
 
         return response()->json(['message'=>'delete success'], 204);
     }
