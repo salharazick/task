@@ -14,7 +14,7 @@ use Illuminate\Validation\ValidationException;
 class productsController extends Controller
 {
     /**
-     * Display a listing of the resource with filter and pagination.
+     * Display a listing of the resource.
      *
      * @return \Illuminate\Http\Response
      */
@@ -36,9 +36,9 @@ class productsController extends Controller
         $nextPageUrl = $products->appends($request->query())->nextPageUrl();
 
         return response()->json([
-        'data' => productResource::collection($products),
-        'next_page_url' => $nextPageUrl,
-    ]);
+            'data' => productResource::collection($products),
+            'next_page_url' => $nextPageUrl,
+        ]);
 
     }
 
